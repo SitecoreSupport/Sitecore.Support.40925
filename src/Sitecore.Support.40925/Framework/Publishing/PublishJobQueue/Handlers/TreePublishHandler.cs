@@ -41,7 +41,7 @@ namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
 
       if (_options.ContentAvailability)
       {
-        targetPublishStream = new Sitecore.Framework.Publishing.ManifestCalculation.ContentAvailabilityVariantsProducer(publishStream,
+        targetPublishStream = new Sitecore.Support.Framework.Publishing.ManifestCalculation.ContentAvailabilityVariantsProducer(publishStream,
             targetIndex,
             publishContext.PublishOptions.Languages.Select(l => Language.Parse(l)).ToArray(),
             targetId,
@@ -49,12 +49,12 @@ namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
             publishContext.PublishOptions.GetRepublish(),
             publishContext.Started,
             errorSource,
-            _loggerFactory.CreateLogger<Sitecore.Framework.Publishing.ManifestCalculation.ContentAvailabilityVariantsProducer>(),
+            _loggerFactory.CreateLogger<Sitecore.Support.Framework.Publishing.ManifestCalculation.ContentAvailabilityVariantsProducer>(),
             _loggerFactory.CreateLogger<DiagnosticLogger>());
       }
       else if (_options.ContentTesting)
       {
-        targetPublishStream = new Sitecore.Framework.Publishing.ManifestCalculation.TestingVariantsValidationTargetProducer(
+        targetPublishStream = new Sitecore.Support.Framework.Publishing.ManifestCalculation.TestingVariantsValidationTargetProducer(
             publishStream,
             targetIndex,
             publishContext.SourceStore.GetTestableContentRepository(),
@@ -64,12 +64,12 @@ namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
             publishContext.PublishOptions.GetRepublish(),
             publishContext.Started,
             errorSource,
-            _loggerFactory.CreateLogger<Sitecore.Framework.Publishing.ManifestCalculation.TestingVariantsValidationTargetProducer>(),
+            _loggerFactory.CreateLogger<Sitecore.Support.Framework.Publishing.ManifestCalculation.TestingVariantsValidationTargetProducer>(),
             _loggerFactory.CreateLogger<DiagnosticLogger>());
       }
       else
       {
-        targetPublishStream = new Sitecore.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer(
+        targetPublishStream = new Sitecore.Support.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer(
             publishStream,
             targetIndex,
             publishContext.PublishOptions.Languages.Select(l => Language.Parse(l)).ToArray(),
@@ -78,7 +78,7 @@ namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
             publishContext.PublishOptions.GetRepublish(),
             publishContext.Started,
             errorSource,
-            _loggerFactory.CreateLogger<Sitecore.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer>(),
+            _loggerFactory.CreateLogger<Sitecore.Support.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer>(),
             _loggerFactory.CreateLogger<DiagnosticLogger>());
       }
 

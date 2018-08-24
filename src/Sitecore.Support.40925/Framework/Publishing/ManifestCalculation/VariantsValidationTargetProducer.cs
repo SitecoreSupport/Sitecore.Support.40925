@@ -35,7 +35,7 @@ namespace Sitecore.Support.Framework.Publishing.ManifestCalculation
               var candidates = ctxs
                         .Where(ctx => ctx.IsValid)
                         .Select(ctx => ctx.AsValid().Candidate)
-                        .Distinct()
+                        .Distinct(new SupportComparer())
                         .ToArray();
 
               if (!candidates.Any()) return;

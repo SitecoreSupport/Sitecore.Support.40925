@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Framework\Publishing\ManifestCalculation\ContentAvailabilityVariantsProducer.cs" />
+    <Compile Include="Framework\Publishing\ManifestCalculation\SupportComparer.cs" />
     <Compile Include="Framework\Publishing\ManifestCalculation\TestingVariantsValidationTargetProducer.cs" />
     <Compile Include="Framework\Publishing\ManifestCalculation\VariantsValidationTargetProducer.cs" />
     <Compile Include="Framework\Publishing\PublishJobQueue\Handlers\IncrementalPublishHandler.cs" />
@@ -100,11 +101,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Config\Include\zzz\Sitecore.Support.40925.config" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
     <None Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config\global\sc.Sitecore.Support.40925.xml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
