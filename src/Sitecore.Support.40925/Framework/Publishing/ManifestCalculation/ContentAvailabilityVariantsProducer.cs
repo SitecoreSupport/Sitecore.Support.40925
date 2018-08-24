@@ -7,7 +7,7 @@ using Sitecore.Framework.Publishing.ManifestCalculation;
 
 namespace Sitecore.Support.Framework.Publishing.ManifestCalculation
 {
-  public class ContentAvailabilityVariantsProducer : Sitecore.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer
+  public class ContentAvailabilityVariantsProducer : Sitecore.Support.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer
   {
     public ContentAvailabilityVariantsProducer(IObservable<CandidateValidationContext> publishStream, ITargetItemIndexService targetIndexService, Language[] languages, Guid targetId, int bufferSize, bool republishAllVariants, DateTime publishTimestamp, CancellationTokenSource errorSource, ILogger logger, ILogger diagnosticLogger) : base(publishStream, targetIndexService, languages, targetId, bufferSize, republishAllVariants, publishTimestamp, errorSource, logger, diagnosticLogger)
     {

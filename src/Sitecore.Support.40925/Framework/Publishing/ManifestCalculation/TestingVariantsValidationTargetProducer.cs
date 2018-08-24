@@ -11,7 +11,7 @@ using Sitecore.Framework.Publishing.ManifestCalculation;
 
 namespace Sitecore.Support.Framework.Publishing.ManifestCalculation
 {
-  public class TestingVariantsValidationTargetProducer : Sitecore.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer
+  public class TestingVariantsValidationTargetProducer : Sitecore.Support.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer
   {
     protected readonly ITestableContentRepository _contentTestRepository;
     protected Dictionary<Guid, HashSet<IItemVariantIdentifier>> _itemsUnderTest;
