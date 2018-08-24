@@ -1,0 +1,88 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Sitecore.Framework.Eventing;
+using Sitecore.Framework.Publishing;
+using Sitecore.Framework.Publishing.Data;
+using Sitecore.Framework.Publishing.DataPromotion;
+using Sitecore.Framework.Publishing.Item;
+using Sitecore.Framework.Publishing.ManifestCalculation;
+using Sitecore.Framework.Publishing.PublisherOperations;
+using Sitecore.Framework.Publishing.PublishJobQueue;
+namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
+{
+  public class IncrementalPublishHandler : Sitecore.Framework.Publishing.PublishJobQueue.Handlers.IncrementalPublishHandler
+  {
+    public IncrementalPublishHandler(IRequiredPublishFieldsResolver requiredPublishFieldsResolver, IPublisherOperationService publisherOpsService, IPromotionCoordinator promoterCoordinator, IEventRegistry eventRegistry, ILoggerFactory loggerFactory, IApplicationLifetime applicationLifetime, PublishJobHandlerOptions options = null) : base(requiredPublishFieldsResolver, publisherOpsService, promoterCoordinator, eventRegistry, loggerFactory, applicationLifetime, options)
+    {
+    }
+
+    public IncrementalPublishHandler(IRequiredPublishFieldsResolver requiredPublishFieldsResolver, IPublisherOperationService publisherOpsService, IPromotionCoordinator promoterCoordinator, IEventRegistry eventRegistry, ILoggerFactory loggerFactory, IApplicationLifetime applicationLifetime, IConfiguration config) : base(requiredPublishFieldsResolver, publisherOpsService, promoterCoordinator, eventRegistry, loggerFactory, applicationLifetime, config)
+    {
+    }
+
+    protected override IObservable<CandidateValidationTargetContext> CreateTargetProcessingStream(
+            PublishContext publishContext,
+            IPublishCandidateSource publishSourceRepository,
+            IPublishValidator validator,
+            IObservable<CandidateValidationContext> publishStream,
+            ITargetItemIndexService targetIndex,
+            IRequiredPublishFieldsResolver requiredPublishFieldsResolver,
+            HashSet<Guid> cloneSourcesLookup,
+            CancellationTokenSource errorSource,
+            Guid targetId)
+    {
+      IObservable<CandidateValidationTargetContext> targetPublishStream = null;
+
+      if (_options.ContentAvailability)
+      {
+        targetPublishStream = new Sitecore.Framework.Publishing.ManifestCalculation.ContentAvailabilityVariantsProducer(publishStream,
+            targetIndex,
+            publishContext.PublishOptions.Languages.Select(l => Language.Parse(l)).ToArray(),
+            targetId,
+            _options.TargetOperationsBatchSize,
+            publishContext.PublishOptions.GetRepublish(),
+            publishContext.Started,
+            errorSource,
+            _loggerFactory.CreateLogger<Sitecore.Framework.Publishing.ManifestCalculation.ContentAvailabilityVariantsProducer>(),
+            _loggerFactory.CreateLogger<DiagnosticLogger>());
+      }
+      else if (_options.ContentTesting)
+      {
+        targetPublishStream = new Sitecore.Framework.Publishing.ManifestCalculation.TestingVariantsValidationTargetProducer(
+            publishStream,
+            targetIndex,
+            publishContext.SourceStore.GetTestableContentRepository(),
+            publishContext.PublishOptions.Languages.Select(l => Language.Parse(l)).ToArray(),
+            targetId,
+            _options.TargetOperationsBatchSize,
+            publishContext.PublishOptions.GetRepublish(),
+            publishContext.Started,
+            errorSource,
+            _loggerFactory.CreateLogger<Sitecore.Framework.Publishing.ManifestCalculation.TestingVariantsValidationTargetProducer>(),
+            _loggerFactory.CreateLogger<DiagnosticLogger>());
+      }
+      else
+      {
+        targetPublishStream = new Sitecore.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer(
+            publishStream,
+            targetIndex,
+            publishContext.PublishOptions.Languages.Select(l => Language.Parse(l)).ToArray(),
+            targetId,
+            _options.TargetOperationsBatchSize,
+            publishContext.PublishOptions.GetRepublish(),
+            publishContext.Started,
+            errorSource,
+            _loggerFactory.CreateLogger<Sitecore.Framework.Publishing.ManifestCalculation.VariantsValidationTargetProducer>(),
+            _loggerFactory.CreateLogger<DiagnosticLogger>());
+      }
+
+      return targetPublishStream;
+    }
+  }
+}

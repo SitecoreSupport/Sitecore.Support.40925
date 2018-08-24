@@ -42,6 +42,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Hosting.Abstractions">
+      <HintPath>..\..\lib\Microsoft.AspNetCore.Hosting.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+      <HintPath>..\..\lib\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Logging">
       <HintPath>..\..\lib\Microsoft.Extensions.Logging.dll</HintPath>
     </Reference>
@@ -51,11 +57,17 @@
     <Reference Include="Sitecore.Framework.Conditions">
       <HintPath>..\..\lib\Sitecore.Framework.Conditions.dll</HintPath>
     </Reference>
+    <Reference Include="Sitecore.Framework.Eventing.Abstractions">
+      <HintPath>..\..\lib\Sitecore.Framework.Eventing.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Sitecore.Framework.Publishing">
       <HintPath>..\..\lib\Sitecore.Framework.Publishing.dll</HintPath>
     </Reference>
     <Reference Include="Sitecore.Framework.Publishing.Abstractions">
       <HintPath>..\..\lib\Sitecore.Framework.Publishing.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Framework.Publishing.Data">
+      <HintPath>..\..\lib\Sitecore.Framework.Publishing.Data.dll</HintPath>
     </Reference>
     <Reference Include="Sitecore.Framework.Publishing.Service.Abstractions">
       <HintPath>..\..\lib\Sitecore.Framework.Publishing.Service.Abstractions.dll</HintPath>
@@ -83,6 +95,8 @@
     <Compile Include="Framework\Publishing\ManifestCalculation\ContentAvailabilityVariantsProducer.cs" />
     <Compile Include="Framework\Publishing\ManifestCalculation\TestingVariantsValidationTargetProducer.cs" />
     <Compile Include="Framework\Publishing\ManifestCalculation\VariantsValidationTargetProducer.cs" />
+    <Compile Include="Framework\Publishing\PublishJobQueue\Handlers\IncrementalPublishHandler.cs" />
+    <Compile Include="Framework\Publishing\PublishJobQueue\Handlers\TreePublishHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
