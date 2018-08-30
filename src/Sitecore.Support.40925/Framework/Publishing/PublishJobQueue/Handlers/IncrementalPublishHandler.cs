@@ -12,6 +12,7 @@ using Sitecore.Framework.Publishing.Data;
 using Sitecore.Framework.Publishing.DataPromotion;
 using Sitecore.Framework.Publishing.Item;
 using Sitecore.Framework.Publishing.ManifestCalculation;
+using Sitecore.Framework.Publishing.ManifestCalculation.TargetProducers;
 using Sitecore.Framework.Publishing.PublisherOperations;
 using Sitecore.Framework.Publishing.PublishJobQueue;
 namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
@@ -26,7 +27,7 @@ namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
     {
     }
 
-    protected override IObservable<CandidateValidationTargetContext> CreateTargetProcessingStream(
+    protected virtual IObservable<CandidateValidationTargetContext> CreateTargetProcessingStreamBase(
             PublishContext publishContext,
             IPublishCandidateSource publishSourceRepository,
             IPublishValidator validator,
@@ -83,6 +84,81 @@ namespace Sitecore.Support.Framework.Publishing.PublishJobQueue.Handlers
       }
 
       return targetPublishStream;
+    }
+
+    protected override IObservable<CandidateValidationTargetContext> CreateTargetProcessingStream(
+            PublishContext publishContext,
+            IPublishCandidateSource publishSourceRepository,
+            IPublishValidator validator,
+            IObservable<CandidateValidationContext> publishStream,
+            ITargetItemIndexService targetIndex,
+            IRequiredPublishFieldsResolver requiredPublishFieldsResolver,
+            HashSet<Guid> cloneSourcesLookup,
+            CancellationTokenSource errorSource,
+            Guid targetId)
+    {
+
+      publishStream = new IncrementalPublishDescendantsTargetProducer(
+          publishStream,
+          publishSourceRepository,
+          publishContext.SourceStore.GetSourceIndex(),
+          targetIndex,
+          errorSource,
+          _loggerFactory.CreateLogger<IncrementalPublishDescendantsTargetProducer>(),
+          _loggerFactory.CreateLogger<DiagnosticLogger>()
+      );
+
+      if (_options.DeleteOphanedItems)
+      {
+        var orphanStream = new OrphanedItemValidationTargetProducer(publishStream,
+            targetIndex,
+            publishContext.SourceStore.GetItemReadRepository(),
+            _options,
+            errorSource,
+            _loggerFactory.CreateLogger<OrphanedItemValidationTargetProducer>(),
+             _loggerFactory.CreateLogger<DiagnosticLogger>());
+
+        publishStream = publishStream.Merge(orphanStream);
+      }
+
+      var targetPublishStream = CreateTargetProcessingStreamBase(
+          publishContext,
+          publishSourceRepository,
+          validator,
+          publishStream,
+          targetIndex,
+          requiredPublishFieldsResolver,
+          cloneSourcesLookup,
+          errorSource,
+          targetId);
+
+      targetPublishStream = new DeferredItemsTargetProducer(
+          targetPublishStream,
+          publishContext.SourceStore.GetSourceIndex(),
+          targetIndex,
+          errorSource,
+          _loggerFactory.CreateLogger<DeferredItemsTargetProducer>());
+
+      var invalidCloneItemsStream = new CloneSourceValidationTargetProducer(
+          publishContext.SourceStore.Name,
+          targetId,
+          targetPublishStream,
+          publishContext.ItemsRelationshipStore.GetItemRelationshipRepository(),
+          publishContext.SourceStore.GetSourceIndex(),
+          publishSourceRepository,
+          cloneSourcesLookup,
+          _options.RelatedItemBatchSize,
+          errorSource,
+          _loggerFactory.CreateLogger<CloneSourceValidationTargetProducer>(),
+          _loggerFactory.CreateLogger<DiagnosticLogger>());
+
+      var finalTargetPublishStream = targetPublishStream
+          .Merge(invalidCloneItemsStream)
+          .Publish();
+
+      finalTargetPublishStream.Connect();
+
+      return finalTargetPublishStream;
     }
   }
 }
